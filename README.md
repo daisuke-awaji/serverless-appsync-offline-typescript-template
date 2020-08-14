@@ -1,3 +1,9 @@
+# serverless-appsync-offline-typescript-template
+
+[![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com)
+
+A Serverless Framework template that allows you to launch an AppSync emulator locally and proceed with development. Lambda Function build by TypeScript/Webpack. This is the data source to which the resolver connects.
+
 ### Usage
 
 serverless create by this template
