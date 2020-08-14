@@ -9,7 +9,7 @@ A Serverless Framework template that allows you to launch an AppSync emulator lo
 serverless create by this template
 
 ```
-serverless create --template-url xxx --path myService
+$ serverless create --template-url https://github.com/daisuke-awaji/serverless-appsync-offline-typescript-template --path myService
 ```
 
 ### Install
