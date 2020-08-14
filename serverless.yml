@@ -1,0 +1,158 @@
+service:
+  name: serverless-appsync-offline-typescript-template
+# app and org for use with dashboard.serverless.com
+#app: your-app-name
+#org: your-org-name
+
+plugins:
+  - serverless-webpack
+  - serverless-appsync-plugin
+  - serverless-dynamodb-local
+  - serverless-appsync-simulator
+  - serverless-offline
+
+custom:
+  appsync-simulator:
+    location: ".webpack/service"
+
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+      seed: true
+    seed:
+      dev:
+        sources:
+          - table: task
+            sources: [./migrations/tasks.json]
+  appSync:
+    name: taskboard_backend
+    authenticationType: AMAZON_COGNITO_USER_POOLS
+    userPoolConfig:
+      awsRegion: ap-northeast-1
+      userPoolId: ap-northeast-1_xxxxxxx
+      defaultAction: ALLOW
+    schema: schema.graphql
+    dataSources:
+      - type: AMAZON_DYNAMODB
+        name: task
+        description: Task table
+        config:
+          tableName: { Ref: Table }
+          serviceRoleArn: { Fn::GetAtt: [AppSyncDynamoDBServiceRole, Arn] }
+          region: ap-northeast-1
+      - type: AWS_LAMBDA
+        name: info
+        description: Lambda DataSource for application infomation
+        config:
+          functionName: info
+          iamRoleStatements:
+            - Effect: "Allow"
+              Action:
+                - "lambda:invokeFunction"
+              Resource:
+                - "*"
+    mappingTemplatesLocation: mapping-templates
+    mappingTemplates:
+      - dataSource: info
+        type: Query
+        field: info
+        request: Query.info.request.vtl
+        response: Query.info.response.vtl
+      - type: Query
+        field: getTask
+        kind: PIPELINE
+        request: "start.vtl"
+        response: "end.vtl"
+        functions:
+          - getTask
+      - dataSource: task
+        type: Query
+        field: listTasks
+        request: "Query.listTasks.request.vtl"
+        response: "Query.listTasks.response.vtl"
+      - dataSource: task
+        type: Mutation
+        field: createTask
+        request: "Mutation.createTask.request.vtl"
+        response: "end.vtl"
+      - dataSource: task
+        type: Mutation
+        field: updateTask
+        request: "Mutation.updateTask.request.vtl"
+        response: "end.vtl"
+      - dataSource: task
+        type: Mutation
+        field: deleteTask
+        request: "Mutation.deleteTask.request.vtl"
+        response: "end.vtl"
+    functionConfigurations:
+      - dataSource: task
+        name: "getTask"
+        request: "getTask.request.vtl"
+        response: "getTask.response.vtl"
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  apiGateway:
+    minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+
+functions:
+  info:
+    handler: handler.info
+
+resources:
+  Resources:
+    Table:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: task
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: status
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+          - AttributeName: status
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+
+    AppSyncDynamoDBServiceRole:
+      Type: "AWS::IAM::Role"
+      Properties:
+        RoleName: appsync-dynamodb-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Principal:
+                Service:
+                  - "appsync.amazonaws.com"
+              Action:
+                - "sts:AssumeRole"
+        Policies:
+          - PolicyName: "dynamo-policy"
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: "Allow"
+                  Action:
+                    - "dynamodb:Query"
+                    - "dynamodb:BatchWriteItem"
+                    - "dynamodb:GetItem"
+                    - "dynamodb:DeleteItem"
+                    - "dynamodb:PutItem"
+                    - "dynamodb:Scan"
+                    - "dynamodb:UpdateItem"
+                  Resource:
+                    - "*"

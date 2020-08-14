@@ -1,0 +1,155 @@
+type AppInfo {
+  name: String!
+  version: String!
+}
+
+type Task {
+  id: ID!
+  name: String!
+  status: String!
+}
+
+type Query {
+  info: AppInfo
+  getTask(id: ID!, status: String!): Task
+  listTasks(
+    filter: ModelTaskFilterInput
+    limit: Int
+    nextToken: String
+  ): ListTasks
+}
+
+input ModelTaskFilterInput {
+  id: ModelIDInput
+  name: ModelStringInput
+  and: [ModelTaskFilterInput]
+  or: [ModelTaskFilterInput]
+  not: ModelTaskFilterInput
+}
+
+type ListTasks {
+  tasks: [Task]
+  nextToken: String
+}
+
+type Mutation {
+  createTask(input: CreateTaskInput!, condition: ModelTaskConditionInput): Task
+  updateTask(input: UpdateTaskInput!, condition: ModelTaskConditionInput): Task
+  deleteTask(input: DeleteTaskInput!, condition: ModelTaskConditionInput): Task
+}
+
+input CreateTaskInput {
+  id: ID
+  name: String!
+  status: String!
+}
+
+input UpdateTaskInput {
+  id: ID!
+  name: String
+  status: String
+}
+
+input DeleteTaskInput {
+  id: ID!
+  status: String!
+}
+
+input ModelTaskConditionInput {
+  name: ModelStringInput
+  and: [ModelTaskConditionInput]
+  or: [ModelTaskConditionInput]
+  not: ModelTaskConditionInput
+}
+
+# 以下、AppSyncとDynamoDBで使用可能な GraphQL Schema の共通定義
+input ModelIDInput {
+  ne: ID
+  eq: ID
+  le: ID
+  lt: ID
+  ge: ID
+  gt: ID
+  contains: ID
+  notContains: ID
+  between: [ID]
+  beginsWith: ID
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+enum ModelAttributeTypes {
+  binary
+  binarySet
+  bool
+  list
+  map
+  number
+  numberSet
+  string
+  stringSet
+  _null
+}
+
+input ModelBooleanInput {
+  ne: Boolean
+  eq: Boolean
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelFloatInput {
+  ne: Float
+  eq: Float
+  le: Float
+  lt: Float
+  ge: Float
+  gt: Float
+  between: [Float]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelIntInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelSizeInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+}
+
+enum ModelSortDirection {
+  ASC
+  DESC
+}
+
+input ModelStringInput {
+  ne: String
+  eq: String
+  le: String
+  lt: String
+  ge: String
+  gt: String
+  contains: String
+  notContains: String
+  between: [String]
+  beginsWith: String
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}

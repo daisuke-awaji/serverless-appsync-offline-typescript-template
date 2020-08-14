@@ -1,0 +1,31 @@
+{
+  "name": "serverless-appsync-offline-typescript-template",
+  "version": "1.0.0",
+  "description": "Serverless appsync offline example using Typescript bundle with webpack.",
+  "main": "handler.js",
+  "scripts": {
+    "sls:setup": "sls dynamodb install",
+    "start": "sls offline start"
+  },
+  "dependencies": {
+    "source-map-support": "^0.5.10"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.17",
+    "@types/node": "^10.12.18",
+    "amplify-appsync-simulator": "^1.23.1",
+    "fork-ts-checker-webpack-plugin": "^3.0.1",
+    "serverless": "^1.78.1",
+    "serverless-appsync-plugin": "^1.3.1",
+    "serverless-appsync-simulator": "^0.7.0",
+    "serverless-dynamodb-local": "^0.2.39",
+    "serverless-offline": "^6.5.0",
+    "serverless-webpack": "^5.2.0",
+    "ts-loader": "^5.3.3",
+    "typescript": "^3.2.4",
+    "webpack": "^4.29.0",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "author": "The serverless webpack authors (https://github.com/elastic-coders/serverless-webpack)",
+  "license": "MIT"
+}
