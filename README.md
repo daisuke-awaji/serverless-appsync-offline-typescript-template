@@ -4,6 +4,14 @@
 
 A Serverless Framework template that allows you to launch an AppSync emulator locally and proceed with development. Lambda Function build by TypeScript/Webpack.
 
+Template features:
+- [AppSync Simulator](https://github.com/bboure/serverless-appsync-simulator) built with [serverless-appsync-plugin](https://github.com/sid88in/serverless-appsync-plugin).
+- Lambda Function written by TypeScript/Webpack.
+- Localhosting functions with [Serverless Offline](https://github.com/dherault/serverless-offline).
+- Unit testing example for VTL templates.
+- Integrate testing example for AppSync Graphql Requests.
+- CircleCI support.
+
 ### Usage
 
 serverless create by this template
